@@ -14,6 +14,7 @@ public final class Hardcore extends JavaPlugin {
     public void onEnable() {
         saveDefaultConfig();
         getLogger().info("Hardcore plugin has been enabled!");
+        getConfig().set("version", getDescription().getVersion());
         databaseManager = new DatabaseManager();
         databaseManager.connect();
         new utils(this);

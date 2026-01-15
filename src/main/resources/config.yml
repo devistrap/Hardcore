@@ -1,5 +1,5 @@
 version: 1.0
-prefix: "&[hc] "
+prefix: "&e[hc] "
 settings:
   permanent-deathban: true
   deathban-duration: 30 # Duration in minutes
