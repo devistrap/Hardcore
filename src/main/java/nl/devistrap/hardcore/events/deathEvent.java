@@ -3,6 +3,7 @@ package nl.devistrap.hardcore.events;
 import nl.devistrap.hardcore.DatabaseManager;
 import nl.devistrap.hardcore.Hardcore;
 import nl.devistrap.hardcore.service.DiscordWebhookNotifier;
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -24,6 +25,14 @@ public class deathEvent implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerDeath(org.bukkit.event.entity.PlayerDeathEvent event) {
         if(!plugin.getConfig().getBoolean("settings.permanent-deathban")) {
+
+            long timeplayed = Bukkit.getPlayer(event.getEntity().getName()).getStatistic(org.bukkit.Statistic.PLAY_ONE_MINUTE);
+            long gracePeriodDuration = dbManager.getGracePeriod(event.getEntity().getName()) * 60000;
+            long timeLeft = gracePeriodDuration - timeplayed;
+            if (timeLeft > 0) {
+                event.getEntity().sendMessage("You are in a grace period and cannot be deathbanned yet! Time left: " + timeLeft / 60000 + " minutes.");
+                return;
+            }
             String timeBanned = plugin.getConfig().getString("settings.deathban-duration");
             if (plugin.getConfig().getBoolean("discord-webhook.notify-on.automatic-deathban.enabled")) {
                 DiscordWebhookNotifier.sendWebhookNotification("Player " + event.getEntity().getName() + " has been deathbanned", event.getEntity().getName(), plugin.getConfig().getBoolean("discord-webhook.notify-on.automatic-deathban.ping-role"));
