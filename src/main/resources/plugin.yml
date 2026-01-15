@@ -17,3 +17,5 @@ commands:
         aliases: [dbl]
     revive:
         description: Revive a deathbanned player.
+    grace:
+        description: Check your remaining grace period time.

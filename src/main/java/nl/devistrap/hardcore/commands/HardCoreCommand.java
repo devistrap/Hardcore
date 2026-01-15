@@ -24,7 +24,7 @@ public class HardCoreCommand implements CommandExecutor, TabExecutor {
 
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] args) {
-        if (commandSender.hasPermission("hardcore.admin")) {
+        if (!commandSender.hasPermission("hardcore.admin")) {
             commandSender.sendMessage(utils.color("&cYou do not have permission to use this command.", true));
             return true;
         }

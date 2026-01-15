@@ -1,9 +1,6 @@
 package nl.devistrap.hardcore;
 
-import nl.devistrap.hardcore.commands.DeathBanCommand;
-import nl.devistrap.hardcore.commands.DeathBanListCommand;
-import nl.devistrap.hardcore.commands.HardCoreCommand;
-import nl.devistrap.hardcore.commands.ReviveCommand;
+import nl.devistrap.hardcore.commands.*;
 import nl.devistrap.hardcore.events.JoinEvent;
 import nl.devistrap.hardcore.events.deathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -25,6 +22,7 @@ public final class Hardcore extends JavaPlugin {
         new DeathBanCommand(this);
         new DeathBanListCommand(this);
         new ReviveCommand(this);
+        new GraceCommand(this);
 
         new JoinEvent(this);
         new deathEvent(this);

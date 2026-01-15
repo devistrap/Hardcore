@@ -3,6 +3,7 @@ prefix: "&[hc] "
 settings:
   permanent-deathban: true
   deathban-duration: 30 # Duration in minutes
+  grace-period: 5 # Duration in minutes
 
 
 discord-webhook:
