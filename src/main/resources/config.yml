@@ -1,0 +1,14 @@
+version: 1.0
+settings:
+  permanent-deathban: true
+  deathban-duration: 30 # Duration in minutes
+
+
+discord-webhook:
+    url: "https://discord.com/api/webhooks/your-webhook-url"
+    server-name: "Hardcore Minecraft Server"
+    ping-role-id: "123456789012345678"
+    notify-on:
+      manual-deathban: true
+      automatic-deathban: true
+      revive: true

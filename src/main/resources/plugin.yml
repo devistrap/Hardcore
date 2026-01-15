@@ -1,0 +1,19 @@
+name: Hardcore
+version: ${project.version}
+main: nl.devistrap.hardcore.Hardcore
+api-version: '1.21'
+authors:
+  - Devistrap
+description: A hardcore game mode plugin for Minecraft servers.
+commands:
+    hardcore:
+        description: Main command for Hardcore plugin.
+        aliases: [hc]
+    deathban:
+        description: Manage deathban settings.
+        aliases: [db]
+    deathbanlist:
+        description: List all currently deathbanned players.
+        aliases: [dbl]
+    revive:
+        description: Revive a deathbanned player.
