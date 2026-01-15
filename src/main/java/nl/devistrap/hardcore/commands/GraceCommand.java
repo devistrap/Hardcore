@@ -2,6 +2,7 @@ package nl.devistrap.hardcore.commands;
 
 import nl.devistrap.hardcore.DatabaseManager;
 import nl.devistrap.hardcore.Hardcore;
+import nl.devistrap.hardcore.service.DiscordWebhookNotifier;
 import nl.devistrap.hardcore.utils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -63,6 +64,9 @@ public class GraceCommand implements CommandExecutor, TabExecutor {
              }
             dbManager.removeGracePeriod(strings[1]);
             commandSender.sendMessage(utils.color("&eRemoved grace period for player: " + strings[1], true));
+             if (plugin.getConfig().getBoolean("discord-webhook.notify-on.grace-remove.enabled")) {
+                 DiscordWebhookNotifier.sendWebhookNotification(strings[1] + "'s grace has been removed by " + commandSender.getName(), strings[1], plugin.getConfig().getBoolean("discord-webhook.notify-on.grace-remove.ping-role"));
+             }
         } else {
             commandSender.sendMessage(utils.color("&eInvalid action. Usage: /grace <check|remove> [player]", true));
         }
