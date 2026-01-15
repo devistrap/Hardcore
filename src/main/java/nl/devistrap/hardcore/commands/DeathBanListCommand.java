@@ -3,6 +3,7 @@ package nl.devistrap.hardcore.commands;
 import nl.devistrap.hardcore.DatabaseManager;
 import nl.devistrap.hardcore.Hardcore;
 import nl.devistrap.hardcore.objects.playerFromDb;
+import nl.devistrap.hardcore.utils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -26,8 +27,8 @@ public class DeathBanListCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] strings) {
-        if (commandSender.hasPermission("hardcore.deathbanlist")) {
-            commandSender.sendMessage("Banned players:");
+        if (commandSender.hasPermission("hardcore.admin")) {
+            commandSender.sendMessage(utils.color("&aBanned players:", true));
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.systemDefault());
             for (playerFromDb playerInfo : dbManager.getAllBannedPlayers()) {
                 if(playerInfo.getBanTime() == null) {

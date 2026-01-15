@@ -29,7 +29,7 @@ public class DeathBanCommand implements CommandExecutor, TabExecutor {
 
     @Override
     public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
-        if (commandSender.hasPermission("hardcore.deathban")) {
+        if (commandSender.hasPermission("hardcore.admin")) {
             if (args.length != 1) {
                 commandSender.sendMessage("Usage: /deathban <player>");
                 return true;
@@ -51,13 +51,13 @@ public class DeathBanCommand implements CommandExecutor, TabExecutor {
             }
             else {
                 dbManager.deathBanPlayer(Bukkit.getPlayer(targetPlayerName), null);
-                if (plugin.getConfig().getBoolean("discord-webhook.notify-on.manual-deathban")) {
-                    DiscordWebhookNotifier.sendWebhookNotification("Player " + targetPlayerName + " has been permanently deathbanned by " + commandSender.getName(), targetPlayerName, false);
+                if (plugin.getConfig().getBoolean("discord-webhook.notify-on.manual-deathban.enabled")) {
+                    DiscordWebhookNotifier.sendWebhookNotification("Player " + targetPlayerName + " has been permanently deathbanned by " + commandSender.getName(), targetPlayerName, plugin.getConfig().getBoolean("discord-webhook.notify-on.manual-deathban.ping-role"));
                 }
             }
 
-            if (plugin.getConfig().getBoolean("discord-webhook.notify-on.manual-deathban")) {
-                DiscordWebhookNotifier.sendWebhookNotification("Player " + targetPlayerName + " has been deathbanned by " + commandSender.getName(), targetPlayerName, false);
+            if (plugin.getConfig().getBoolean("discord-webhook.notify-on.manual-deathban.enabled")) {
+                DiscordWebhookNotifier.sendWebhookNotification("Player " + targetPlayerName + " has been deathbanned by " + commandSender.getName(), targetPlayerName, plugin.getConfig().getBoolean("discord-webhook.notify-on.manual-deathban.ping-role"));
             }
             return true;
         } else {

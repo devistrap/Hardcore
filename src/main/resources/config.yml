@@ -1,4 +1,5 @@
 version: 1.0
+prefix: "&[hc] "
 settings:
   permanent-deathban: true
   deathban-duration: 30 # Duration in minutes
@@ -9,6 +10,12 @@ discord-webhook:
     server-name: "Hardcore Minecraft Server"
     ping-role-id: "123456789012345678"
     notify-on:
-      manual-deathban: true
-      automatic-deathban: true
-      revive: true
+      manual-deathban:
+        enabled: true
+        ping-role: false
+      automatic-deathban:
+        enabled: true
+        ping-role: true
+      revive:
+        enabled: true
+        ping-role: false

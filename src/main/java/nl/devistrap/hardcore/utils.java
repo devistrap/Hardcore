@@ -8,13 +8,21 @@ import org.bukkit.entity.Player;
 
 public class utils {
 
-    public static String color(String s) {
-        return ChatColor.translateAlternateColorCodes('&', s);
+    private static Hardcore plugin;
+    public utils(Hardcore plugin) {
+        this.plugin = plugin;
+    }
+
+    public static String color(String s, boolean prefix) {
+        if(!prefix) {
+            return ChatColor.translateAlternateColorCodes('&', s);
+        }
+        return ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("prefix") + s);
     }
 
     public static void broadcast(String msg) {
         for (Player p : Bukkit.getOnlinePlayers()) {
-            p.sendMessage(color(msg));
+            p.sendMessage(color(msg, false));
         }
     }
 

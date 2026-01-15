@@ -19,6 +19,7 @@ public final class Hardcore extends JavaPlugin {
         getLogger().info("Hardcore plugin has been enabled!");
         databaseManager = new DatabaseManager();
         databaseManager.connect();
+        new utils(this);
 
         new HardCoreCommand(this);
         new DeathBanCommand(this);
