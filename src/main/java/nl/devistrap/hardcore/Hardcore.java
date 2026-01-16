@@ -1,12 +1,24 @@
 package nl.devistrap.hardcore;
 
+import com.velocitypowered.api.proxy.ProxyServer;
 import nl.devistrap.hardcore.commands.*;
 import nl.devistrap.hardcore.events.JoinEvent;
 import nl.devistrap.hardcore.events.deathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import javax.inject.Inject;
+import java.net.Proxy;
+
 public final class Hardcore extends JavaPlugin {
+
+
+    private final ProxyServer proxy;
+
+    @Inject
+    public Hardcore(ProxyServer proxy) {
+        this.proxy = proxy;
+    }
 
     private DatabaseManager databaseManager;
 
@@ -40,5 +52,9 @@ public final class Hardcore extends JavaPlugin {
 
     public DatabaseManager getDatabaseManager() {
         return databaseManager;
+    }
+
+    public ProxyServer getProxy() {
+        return proxy;
     }
 }

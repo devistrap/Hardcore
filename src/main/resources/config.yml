@@ -5,6 +5,11 @@ settings:
   deathban-duration: 30 # Duration in minutes
   grace-period: 5 # Duration in minutes
 
+velocity-module:
+    enabled: false
+    commands-to-execute:
+      - "send {player} verliezerseiland"
+      - "msg {player} You have been deathbanned for {duration} minutes."
 
 discord-webhook:
     url: "https://discord.com/api/webhooks/your-webhook-url"

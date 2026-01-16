@@ -1,8 +1,10 @@
 package nl.devistrap.hardcore.events;
 
+import com.velocitypowered.api.proxy.ProxyServer;
 import nl.devistrap.hardcore.DatabaseManager;
 import nl.devistrap.hardcore.Hardcore;
 import nl.devistrap.hardcore.service.DiscordWebhookNotifier;
+import nl.devistrap.hardcore.service.VelocityCommandExecutor;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -13,10 +15,12 @@ import java.sql.Timestamp;
 public class deathEvent implements Listener {
 
     private final Hardcore plugin;
+    private final ProxyServer proxy;
     private final DatabaseManager dbManager;
 
     public deathEvent(Hardcore plugin) {
         this.plugin = plugin;
+        this.proxy = plugin.getProxy();
         this.dbManager = plugin.getDatabaseManager();
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
@@ -39,6 +43,8 @@ public class deathEvent implements Listener {
             }
             dbManager.deathBanPlayer(event.getEntity(), new Timestamp(System.currentTimeMillis() + Integer.parseInt(timeBanned) * 60 * 1000));
             event.getEntity().kickPlayer("You have been deathbanned for " + timeBanned + " minutes.");
+            VelocityCommandExecutor executor = new VelocityCommandExecutor(proxy, plugin);
+            executor.executeCommands(event.getEntity().getName());
         }
         else{
             if (plugin.getConfig().getBoolean("discord-webhook.notify-on.automatic-deathban.enabled")) {
