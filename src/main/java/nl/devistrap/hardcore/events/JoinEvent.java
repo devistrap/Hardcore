@@ -17,7 +17,7 @@ public class JoinEvent implements Listener {
     private final DatabaseManager dbManager;
     private final ProxyServer proxy;
 
-    public JoinEvent(Hardcore plugi) {
+    public JoinEvent(Hardcore plugin) {
         this.plugin = plugin;
         this.proxy = plugin.getProxy();
         this.dbManager = plugin.getDatabaseManager();
