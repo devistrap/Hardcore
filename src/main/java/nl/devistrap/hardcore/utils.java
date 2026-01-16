@@ -4,6 +4,7 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 public class utils {
@@ -23,6 +24,12 @@ public class utils {
     public static void broadcast(String msg) {
         for (Player p : Bukkit.getOnlinePlayers()) {
             p.sendMessage(color(msg, false));
+        }
+    }
+
+    public static void PlaySoundEveryone(String sound) {
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            p.playSound(p.getLocation(), sound, 1.0f, 1.0f);
         }
     }
 

@@ -5,6 +5,7 @@ import nl.devistrap.hardcore.DatabaseManager;
 import nl.devistrap.hardcore.Hardcore;
 import nl.devistrap.hardcore.service.DiscordWebhookNotifier;
 import nl.devistrap.hardcore.service.CommandExecutor;
+import nl.devistrap.hardcore.utils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -42,6 +43,9 @@ public class deathEvent implements Listener {
                 DiscordWebhookNotifier.sendWebhookNotification("Player " + event.getEntity().getName() + " has been deathbanned", event.getEntity().getName(), plugin.getConfig().getBoolean("discord-webhook.notify-on.automatic-deathban.ping-role"));
             }
             dbManager.deathBanPlayer(event.getEntity(), new Timestamp(System.currentTimeMillis() + Integer.parseInt(timeBanned) * 60 * 1000));
+            if(plugin.getConfig().getBoolean("settings.deathban-sound.enabled")) {
+                utils.PlaySoundEveryone(plugin.getConfig().getString("settings.deathban-sound.sound"));
+            }
             if(plugin.getConfig().getBoolean("velocity-module.enabled")) {
                 Bukkit.getScheduler().runTaskLater(plugin, () -> {
                     Player player = Bukkit.getPlayer(event.getEntity().getUniqueId());

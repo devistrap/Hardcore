@@ -37,6 +37,9 @@ public class ReviveCommand implements CommandExecutor, TabExecutor {
         if(args.length == 1) {
             String targetPlayerName = args[0];
             dbManager.revivePlayer(targetPlayerName);
+            if(plugin.getConfig().getBoolean("settings.revive-sound.enabled")) {
+                utils.PlaySoundEveryone(plugin.getConfig().getString("settings.revive-sound.sound"));
+            }
             utils.broadcast(utils.color("Player " + targetPlayerName + " has been revived.", true));
             if(plugin.getConfig().getBoolean("discord-webhook.notify-on.revive.enabled")){
                 DiscordWebhookNotifier.sendWebhookNotification("Player " + targetPlayerName + " has been revived by " + commandSender.getName(), targetPlayerName, plugin.getConfig().getBoolean("discord-webhook.notify-on.revive.ping-role"));
@@ -44,7 +47,7 @@ public class ReviveCommand implements CommandExecutor, TabExecutor {
             return true;
         }
         else{
-            commandSender.sendMessage("Usage: /revive <player>");
+            commandSender.sendMessage(utils.color("&cUsage: /revive <player>", true));
             return false;
         }
     }
