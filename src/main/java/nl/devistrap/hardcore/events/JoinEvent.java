@@ -26,18 +26,22 @@ public class JoinEvent implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerJoin(PlayerJoinEvent event) {
+        if(event.getPlayer().hasPermission("hardcore.bypass")){
+            return;
+        }
         if(dbManager.isPlayerBanned(event.getPlayer())){
             if(plugin.getConfig().getBoolean("velocity-module.enabled")) {
                 Bukkit.getScheduler().runTaskLater(plugin, () -> {
                     Player player = Bukkit.getPlayer(event.getPlayer().getUniqueId());
                     if (player != null && player.isOnline()) {
                         plugin.getLogger().info("Sending deathbanned player " + player.getName() + " to " + plugin.getConfig().getString("velocity-module.server-to-send"));
-                        plugin.getCommandExecutor().executeCommands(player.getName());
                         if(plugin.getConfig().getString("velocity-module.server-to-send") != null && !plugin.getConfig().getString("velocity-module.server-to-send").isEmpty()) {
                             plugin.getCommandExecutor().SendCommand(plugin.getConfig().getString("velocity-module.server-to-send"), player);
+                            plugin.getCommandExecutor().executeCommands(player.getName());
                         }
-                    } else {
-                        plugin.getLogger().warning("Player went offline before commands could be executed");
+                        else {
+                            plugin.getLogger().warning("Player went offline before commands could be executed");
+                        }
                     }
                 }, 20L);
             }

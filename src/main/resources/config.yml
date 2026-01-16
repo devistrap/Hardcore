@@ -6,6 +6,7 @@ settings:
   grace-period: 5 # Duration in minutes
 
 sounds:
+  # Wants a list of all available sounds? Check https://www.digminecraft.com/lists/sound_list_pc.php
   deathban-sound:
     sound: ENTITY_WITHER_SPAWN
     enabled: true
@@ -13,12 +14,11 @@ sounds:
     sound: ENTITY_PLAYER_LEVELUP
     enabled: true
 
-
 velocity-module:
     enabled: false
-    server-to-send: "verliezers"
+    server-to-send: ""
     commands-to-execute:
-      - "msg {player} You have been deathbanned for {duration} minutes."
+      - "msg {player} You have been deathbanned"
 
 discord-webhook:
     url: "https://discord.com/api/webhooks/your-webhook-url"

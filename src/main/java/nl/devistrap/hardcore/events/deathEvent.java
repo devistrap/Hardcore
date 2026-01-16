@@ -29,6 +29,9 @@ public class deathEvent implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerDeath(org.bukkit.event.entity.PlayerDeathEvent event) {
+        if(event.getEntity().getPlayer().hasPermission("hardcore.bypass")){
+            return;
+        }
         if(!plugin.getConfig().getBoolean("settings.permanent-deathban")) {
 
             long timeplayed = Bukkit.getPlayer(event.getEntity().getName()).getStatistic(org.bukkit.Statistic.PLAY_ONE_MINUTE);
