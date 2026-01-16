@@ -2,6 +2,7 @@ package nl.devistrap.hardcore.events;
 
 import nl.devistrap.hardcore.DatabaseManager;
 import nl.devistrap.hardcore.Hardcore;
+import nl.devistrap.hardcore.utils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -51,6 +52,7 @@ public class JoinEvent implements Listener {
         }
         else{
             dbManager.addGracePeriod(event.getPlayer().getName(), new Timestamp(plugin.getConfig().getInt("settings.grace-period-duration") ));
+            utils.addPermission(utils.lpapi.getUserManager().getUser(event.getPlayer().getUniqueId()), "hardcore.ingraceperiod");
             plugin.getLogger().info("Added grace period to player " + event.getPlayer().getName());
         }
     }

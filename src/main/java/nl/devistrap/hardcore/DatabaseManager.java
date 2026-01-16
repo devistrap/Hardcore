@@ -1,5 +1,6 @@
 package nl.devistrap.hardcore;
 
+import net.luckperms.api.model.user.User;
 import nl.devistrap.hardcore.objects.playerFromDb;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -9,9 +10,15 @@ import org.bukkit.entity.Player;
 import java.sql.*;
 import java.util.List;
 
+
 public class DatabaseManager {
 
     private Connection connection;
+    private Hardcore plugin;
+
+    public DatabaseManager(Hardcore plugin) {
+        this.plugin = plugin;
+    }
 
 
     public void connect() {
@@ -100,6 +107,7 @@ public class DatabaseManager {
             pstmt.setString(1, player.getName());
             pstmt.setTimestamp(2,duration);
             pstmt.executeUpdate();
+            utils.addPermission(utils.lpapi.getUserManager().getUser(player.getUniqueId()), "hardcore.deathbanned");
             return true;
 
         } catch (SQLException e) {
@@ -127,6 +135,7 @@ public class DatabaseManager {
                     return true;
                 } else {
                     String deleteSQL = "DELETE FROM deathbans WHERE player_name = ?;";
+                    utils.removePermission(utils.lpapi.getUserManager().getUser(player.getName()), "hardcore.deathbanned");
                     try (PreparedStatement deletePstmt = conn.prepareStatement(deleteSQL)) {
                         deletePstmt.setString(1, player.getName());
                         deletePstmt.executeUpdate();
@@ -143,7 +152,7 @@ public class DatabaseManager {
 
     public boolean revivePlayer(String playerName) {
         String deleteSQL = "DELETE FROM deathbans WHERE player_name = ?;";
-
+        utils.removePermission((User) Bukkit.getOfflinePlayer(playerName), "hardcore.deathbanned");
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(deleteSQL)) {
 
@@ -204,6 +213,7 @@ public class DatabaseManager {
 
             pstmt.setString(1, playerName);
             int affectedRows = pstmt.executeUpdate();
+            utils.removePermission(utils.lpapi.getUserManager().getUser(playerName), "hardcore.deathbanned");
             return affectedRows > 0;
 
         } catch (SQLException e) {

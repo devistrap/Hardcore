@@ -50,6 +50,7 @@ public class Hitevent implements Listener {
         if(dbManager.getGracePeriod(damagedPlayer.getName()) * 60000 > damagedPlayer.getStatistic(org.bukkit.Statistic.PLAY_ONE_MINUTE)){
             damagedPlayer.sendMessage(utils.color("&eYou are in a grace period and cannot be damaged by other players!", true));
             event.setCancelled(true);
+            utils.removePermission(utils.lpapi.getUserManager().getUser(damagedPlayer.getName()), "hardcore.deathbanned");
             return;
         }
 

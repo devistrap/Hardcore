@@ -46,6 +46,7 @@ public class deathEvent implements Listener {
                 DiscordWebhookNotifier.sendWebhookNotification("Player " + event.getEntity().getName() + " has been deathbanned", event.getEntity().getName(), plugin.getConfig().getBoolean("discord-webhook.notify-on.automatic-deathban.ping-role"));
             }
             dbManager.deathBanPlayer(event.getEntity(), new Timestamp(System.currentTimeMillis() + Integer.parseInt(timeBanned) * 60 * 1000));
+            utils.addPermission(utils.lpapi.getUserManager().getUser(event.getEntity().getUniqueId()), "hardcore.deathbanned");
             if(plugin.getConfig().getBoolean("settings.deathban-sound.enabled")) {
                 utils.PlaySoundEveryone(plugin.getConfig().getString("settings.deathban-sound.sound"));
             }
@@ -72,6 +73,7 @@ public class deathEvent implements Listener {
                 DiscordWebhookNotifier.sendWebhookNotification("Player " + event.getEntity().getName() + " has been permanently deathbanned", event.getEntity().getName(), plugin.getConfig().getBoolean("discord-webhook.notify-on.automatic-deathban.ping-role"));
             }
             dbManager.deathBanPlayer(event.getEntity(), null);
+            utils.addPermission(utils.lpapi.getUserManager().getUser(event.getEntity().getUniqueId()), "hardcore.deathbanned");
             event.getEntity().kickPlayer("You have been permanently deathbanned.");
         }
     }

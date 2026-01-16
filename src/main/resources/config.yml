@@ -19,6 +19,10 @@ velocity-module:
     server-to-send: ""
     commands-to-execute:
       - "msg {player} You have been deathbanned"
+luckperms-module:
+  enabled: false
+  deathbanned-has-permission: "hardcore.deathbanned"
+  grace-period-has-permission: "hardcore.ingraceperiod"
 
 discord-webhook:
     url: "https://discord.com/api/webhooks/your-webhook-url"
