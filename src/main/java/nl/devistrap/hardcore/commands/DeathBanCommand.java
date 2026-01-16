@@ -3,6 +3,7 @@ package nl.devistrap.hardcore.commands;
 import nl.devistrap.hardcore.DatabaseManager;
 import nl.devistrap.hardcore.Hardcore;
 import nl.devistrap.hardcore.service.DiscordWebhookNotifier;
+import nl.devistrap.hardcore.service.Messages;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -31,7 +32,7 @@ public class DeathBanCommand implements CommandExecutor, TabExecutor {
     public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
         if (commandSender.hasPermission("hardcore.admin")) {
             if (args.length != 1) {
-                commandSender.sendMessage("Usage: /deathban <player>");
+                Messages.send(commandSender, "deathban_usage");
                 return true;
             }
 
@@ -43,10 +44,10 @@ public class DeathBanCommand implements CommandExecutor, TabExecutor {
                 dbManager.deathBanPlayer(Bukkit.getPlayer(targetPlayerName), new Timestamp(System.currentTimeMillis() + Integer.parseInt(timeBanned) * 60 * 1000));
 
                 if (Bukkit.getPlayer(targetPlayerName) != null) {
-                    Bukkit.getPlayer(targetPlayerName).kickPlayer("You have been deathbanned for " + timeBanned + " minutes.");
+                    Bukkit.getPlayer(targetPlayerName).kickPlayer(Messages.textNoPrefix("deathban_kick_temp", "minutes", timeBanned));
                 }
 
-                commandSender.sendMessage("Player " + targetPlayerName + " has been deathbanned for" + timeBanned + " minutes.");
+                Messages.send(commandSender, "deathban_applied", "player", targetPlayerName, "minutes", timeBanned);
                 return true;
             }
             else {
@@ -61,7 +62,7 @@ public class DeathBanCommand implements CommandExecutor, TabExecutor {
             }
             return true;
         } else {
-            commandSender.sendMessage("You do not have permission to use this command.");
+            Messages.send(commandSender, "no_permission");
             return true;
         }
     }

@@ -2,6 +2,7 @@ package nl.devistrap.hardcore.commands;
 
 import nl.devistrap.hardcore.Hardcore;
 import nl.devistrap.hardcore.service.DiscordWebhookNotifier;
+import nl.devistrap.hardcore.service.Messages;
 import nl.devistrap.hardcore.utils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -26,36 +27,37 @@ public class HardCoreCommand implements CommandExecutor, TabExecutor {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] args) {
         if (!commandSender.hasPermission("hardcore.admin")) {
-            commandSender.sendMessage(utils.color("&cYou do not have permission to use this command.", true));
+            Messages.send(commandSender, "no_permission");
             return true;
         }
 
         String option = args[0];
         if (option.equalsIgnoreCase("reload")) {
             plugin.reloadConfig();
-            commandSender.sendMessage(utils.color("&eHardcore configuration reloaded.", true));
+            Messages.send(commandSender, "hardcore_reloaded");
             if (plugin.getConfig().getBoolean("discord-webhook.notify-on.config-reload.enabled")) {
                 DiscordWebhookNotifier.sendWebhookNotification("Config has been reloaded by " + commandSender.getName(), command.getName(), plugin.getConfig().getBoolean("discord-webhook.notify-on.config-reload.ping-role"));
             }
             return true;
         } else if (option.equalsIgnoreCase("status")) {
-            commandSender.sendMessage(utils.color("&eHardcore plugin is running.", false));
-            commandSender.sendMessage(utils.color("&ePermanent deathban: " + (plugin.getConfig().getBoolean("settings.permanent-deathban") ? "&aEnabled" : "&cDisabled"), false));
-            commandSender.sendMessage(utils.color("&eDeathban duration: " + plugin.getConfig().getString("settings.deathban-duration") + " minutes", false));
+            Messages.send(commandSender, "hardcore_running");
+            String statusLabel = plugin.getConfig().getBoolean("settings.permanent-deathban") ? "&aEnabled" : "&cDisabled";
+            Messages.send(commandSender, "hardcore_permanent_deathban", "status", statusLabel);
+            Messages.send(commandSender, "hardcore_deathban_duration", "minutes", plugin.getConfig().getString("settings.deathban-duration"));
             return true;
         } else if (option.equalsIgnoreCase("version")) {
-            commandSender.sendMessage("&eHardcore plugin version: " + plugin.getDescription().getVersion());
+            Messages.send(commandSender, "hardcore_version", "version", plugin.getDescription().getVersion());
             return true;
         } else if (option.equalsIgnoreCase("permanent")) {
             if (args.length != 2) {
-                commandSender.sendMessage(utils.color("&cUsage: /hardcore permanent <on|off>", true));
+                Messages.send(commandSender, "hardcore_permanent_usage");
                 return true;
             }
             String state = args[1];
             if (state.equalsIgnoreCase("on")) {
                 plugin.getConfig().set("settings.permanent-deathban", true);
                 plugin.saveConfig();
-                commandSender.sendMessage(utils.color("&aPermanent deathban enabled.", true));
+                Messages.send(commandSender, "permanent_enabled");
                 if (plugin.getConfig().getBoolean("discord-webhook.notify-on.permanent-deathban.enabled")) {
                     DiscordWebhookNotifier.sendWebhookNotification("Permanent deathban has been enabled by " + commandSender.getName(), command.getName(), plugin.getConfig().getBoolean("discord-webhook.notify-on.permanent-deathban.ping-role"));
                 }
@@ -64,13 +66,13 @@ public class HardCoreCommand implements CommandExecutor, TabExecutor {
                 plugin.getConfig().set("settings.permanent-deathban", false);
                 plugin.saveConfig();
                 plugin.reloadConfig();
-                commandSender.sendMessage(utils.color("&aPermanent deathban disabled.", true));
+                Messages.send(commandSender, "permanent_disabled");
                 if (plugin.getConfig().getBoolean("discord-webhook.notify-on.permanent-deathban.enabled")) {
                     DiscordWebhookNotifier.sendWebhookNotification("Permanent deathban has been disabled by " + commandSender.getName(), command.getName(), plugin.getConfig().getBoolean("discord-webhook.notify-on.permanent-deathban.ping-role"));
                 }
                 return true;
             } else {
-                commandSender.sendMessage(utils.color("&cUsage: /hardcore permanent <on|off>", true));
+                Messages.send(commandSender, "hardcore_permanent_usage");
                 return true;
             }
         }

@@ -5,6 +5,7 @@ import nl.devistrap.hardcore.commands.*;
 import nl.devistrap.hardcore.events.JoinEvent;
 import nl.devistrap.hardcore.events.deathEvent;
 import nl.devistrap.hardcore.service.CommandExecutor;
+import nl.devistrap.hardcore.service.Messages;
 import org.bukkit.Bukkit;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -25,10 +26,10 @@ public final class Hardcore extends JavaPlugin {
         saveDefaultConfig();
         getLogger().info("Hardcore plugin has been enabled!");
         getConfig().set("version", getDescription().getVersion());
+        Messages.init(this);
         databaseManager = new DatabaseManager(this);
         databaseManager.connect();
         new utils(this);
-
         RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
         if (provider != null) {
             utils.lpapi = provider.getProvider();

@@ -4,6 +4,7 @@ package nl.devistrap.hardcore.events;
 import nl.devistrap.hardcore.DatabaseManager;
 import nl.devistrap.hardcore.Hardcore;
 import nl.devistrap.hardcore.service.DiscordWebhookNotifier;
+import nl.devistrap.hardcore.service.Messages;
 import nl.devistrap.hardcore.service.CommandExecutor;
 import nl.devistrap.hardcore.utils;
 import org.bukkit.Bukkit;
@@ -38,7 +39,7 @@ public class deathEvent implements Listener {
             long gracePeriodDuration = dbManager.getGracePeriod(event.getEntity().getName()) * 60000;
             long timeLeft = gracePeriodDuration - timeplayed;
             if (timeLeft > 0) {
-                event.getEntity().sendMessage("You are in a grace period and cannot be deathbanned yet! Time left: " + timeLeft / 60000 + " minutes.");
+                Messages.send(event.getEntity(), "grace_death_prevented", "minutes", timeLeft / 60000);
                 return;
             }
             String timeBanned = plugin.getConfig().getString("settings.deathban-duration");
@@ -65,7 +66,7 @@ public class deathEvent implements Listener {
                 }, 20L);
             }
             else{
-                event.getEntity().getPlayer().kickPlayer("You are deathbanned!");
+                event.getEntity().getPlayer().kickPlayer(Messages.textNoPrefix("deathban_kick_generic"));
             }
         }
         else{
@@ -74,7 +75,7 @@ public class deathEvent implements Listener {
             }
             dbManager.deathBanPlayer(event.getEntity(), null);
             utils.addPermission(utils.lpapi.getUserManager().getUser(event.getEntity().getUniqueId()), "hardcore.deathbanned");
-            event.getEntity().kickPlayer("You have been permanently deathbanned.");
+            event.getEntity().kickPlayer(Messages.textNoPrefix("deathban_kick_permanent"));
         }
     }
 

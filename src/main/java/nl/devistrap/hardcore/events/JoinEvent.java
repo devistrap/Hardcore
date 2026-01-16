@@ -3,6 +3,7 @@ package nl.devistrap.hardcore.events;
 import nl.devistrap.hardcore.DatabaseManager;
 import nl.devistrap.hardcore.Hardcore;
 import nl.devistrap.hardcore.utils;
+import nl.devistrap.hardcore.service.Messages;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -47,7 +48,7 @@ public class JoinEvent implements Listener {
                 }, 20L);
             }
             else{
-                event.getPlayer().kickPlayer("You are deathbanned!");
+                event.getPlayer().kickPlayer(Messages.textNoPrefix("deathban_kick_generic"));
             }
         }
         else{

@@ -2,7 +2,7 @@ package nl.devistrap.hardcore.events;
 
 import nl.devistrap.hardcore.DatabaseManager;
 import nl.devistrap.hardcore.Hardcore;
-import nl.devistrap.hardcore.utils;
+import nl.devistrap.hardcore.service.Messages;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
@@ -48,14 +48,14 @@ public class Hitevent implements Listener {
         }
 
         if(dbManager.getGracePeriod(damagedPlayer.getName()) * 60000 > damagedPlayer.getStatistic(org.bukkit.Statistic.PLAY_ONE_MINUTE)){
-            damagedPlayer.sendMessage(utils.color("&eYou are in a grace period and cannot be damaged by other players!", true));
+            Messages.send(damagedPlayer, "grace_self_active");
             event.setCancelled(true);
-            utils.removePermission(utils.lpapi.getUserManager().getUser(damagedPlayer.getName()), "hardcore.deathbanned");
+            nl.devistrap.hardcore.utils.removePermission(nl.devistrap.hardcore.utils.lpapi.getUserManager().getUser(damagedPlayer.getName()), "hardcore.deathbanned");
             return;
         }
 
         if(dbManager.getGracePeriod(damagerPlayer.getName()) * 60000 > damagerPlayer.getStatistic(org.bukkit.Statistic.PLAY_ONE_MINUTE)){
-            damagerPlayer.sendMessage(utils.color("&eThe person you hit is in grace and cannot be attacked by you!", true));
+            Messages.send(damagerPlayer, "grace_target_active");
             event.setCancelled(true);
             return;
         }

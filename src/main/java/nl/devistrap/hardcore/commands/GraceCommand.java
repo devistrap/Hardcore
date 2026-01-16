@@ -3,6 +3,7 @@ package nl.devistrap.hardcore.commands;
 import nl.devistrap.hardcore.DatabaseManager;
 import nl.devistrap.hardcore.Hardcore;
 import nl.devistrap.hardcore.service.DiscordWebhookNotifier;
+import nl.devistrap.hardcore.service.Messages;
 import nl.devistrap.hardcore.utils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -33,15 +34,15 @@ public class GraceCommand implements CommandExecutor, TabExecutor {
             long gracePeriodDuration = dbManager.getGracePeriod(strings[1]) * 60000;
             long timeLeft = gracePeriodDuration - timeplayed;
             if (timeLeft > 0) {
-                commandSender.sendMessage(utils.color("&e You have " + timeLeft / 60000 + " minutes of grace left.", true));
+                Messages.send(commandSender, "grace_self_check", "minutes", timeLeft / 60000);
             } else {
-                commandSender.sendMessage(utils.color("&e You have no active grace period.", true));
+                Messages.send(commandSender, "grace_self_none");
             }
         }
         String action = strings[0];
          if(action.equalsIgnoreCase("check")) {
              if(!commandSender.hasPermission("hardcore.grace.check")){
-                 commandSender.sendMessage(utils.color("&cYou do not have permission to use this command.", true));
+                 Messages.send(commandSender, "no_permission");
                  return true;
              }
              if (strings.length == 2) {
@@ -49,26 +50,26 @@ public class GraceCommand implements CommandExecutor, TabExecutor {
                  long gracePeriodDuration = dbManager.getGracePeriod(strings[1]) * 60000;
                  long timeLeft = gracePeriodDuration - timeplayed;
                  if (timeLeft > 0) {
-                     commandSender.sendMessage(utils.color("&e" + strings[1] + " has " + timeLeft / 60000 + " minutes of grace period left.", true));
+                     Messages.send(commandSender, "grace_player_check", "player", strings[1], "minutes", timeLeft / 60000);
                  } else {
-                     commandSender.sendMessage(utils.color("&e" + strings[1] + " does not have an active grace period.", true));
+                     Messages.send(commandSender, "grace_player_none", "player", strings[1]);
                  }
             }
              else {
-                 commandSender.sendMessage(utils.color("&cPlease specify a player to check.", true));
+                 Messages.send(commandSender, "grace_missing_player");
              }
         } else if(action.equalsIgnoreCase("remove")) {
              if(!commandSender.hasPermission("hardcore.admin")){
-                 commandSender.sendMessage(utils.color("&cYou do not have permission to use this command.", true));
+                 Messages.send(commandSender, "no_permission");
                  return true;
              }
             dbManager.removeGracePeriod(strings[1]);
-            commandSender.sendMessage(utils.color("&eRemoved grace period for player: " + strings[1], true));
+            Messages.send(commandSender, "grace_removed", "player", strings[1]);
              if (plugin.getConfig().getBoolean("discord-webhook.notify-on.grace-remove.enabled")) {
                  DiscordWebhookNotifier.sendWebhookNotification(strings[1] + "'s grace has been removed by " + commandSender.getName(), strings[1], plugin.getConfig().getBoolean("discord-webhook.notify-on.grace-remove.ping-role"));
              }
         } else {
-            commandSender.sendMessage(utils.color("&eInvalid action. Usage: /grace <check|remove> [player]", true));
+            Messages.send(commandSender, "grace_invalid_action");
         }
         return true;
     }

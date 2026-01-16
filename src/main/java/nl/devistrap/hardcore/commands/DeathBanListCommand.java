@@ -3,7 +3,7 @@ package nl.devistrap.hardcore.commands;
 import nl.devistrap.hardcore.DatabaseManager;
 import nl.devistrap.hardcore.Hardcore;
 import nl.devistrap.hardcore.objects.playerFromDb;
-import nl.devistrap.hardcore.utils;
+import nl.devistrap.hardcore.service.Messages;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -28,19 +28,19 @@ public class DeathBanListCommand implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] strings) {
         if (commandSender.hasPermission("hardcore.admin")) {
-            commandSender.sendMessage(utils.color("&aBanned players:", true));
+            Messages.send(commandSender, "deathban_list_header");
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.systemDefault());
             for (playerFromDb playerInfo : dbManager.getAllBannedPlayers()) {
                 if(playerInfo.getBanTime() == null) {
-                    commandSender.sendMessage("- " + playerInfo.getPlayerName() + " | Banned permanently");
+                    Messages.send(commandSender, "deathban_list_line_permanent", "player", playerInfo.getPlayerName());
                     continue;
                 }
                 String formattedBanTime = formatter.format(Instant.ofEpochMilli(Long.parseLong(playerInfo.getBanTime())));
-                commandSender.sendMessage("- " + playerInfo.getPlayerName() + " | Banned until: " + formattedBanTime);
+                Messages.send(commandSender, "deathban_list_line_until", "player", playerInfo.getPlayerName(), "until", formattedBanTime);
             }
             return true;
         } else {
-            commandSender.sendMessage("You do not have permission to use this command.");
+            Messages.send(commandSender, "no_permission");
             return true;
         }
     }

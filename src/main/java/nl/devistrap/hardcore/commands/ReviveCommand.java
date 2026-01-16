@@ -3,6 +3,7 @@ package nl.devistrap.hardcore.commands;
 import nl.devistrap.hardcore.DatabaseManager;
 import nl.devistrap.hardcore.Hardcore;
 import nl.devistrap.hardcore.service.DiscordWebhookNotifier;
+import nl.devistrap.hardcore.service.Messages;
 import nl.devistrap.hardcore.utils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -30,7 +31,7 @@ public class ReviveCommand implements CommandExecutor, TabExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
         if(!commandSender.hasPermission("hardcore.admin")) {
-            commandSender.sendMessage(utils.color("&cYou do not have permission to use this command.", true));
+            Messages.send(commandSender, "no_permission");
             return true;
         }
 
@@ -40,14 +41,14 @@ public class ReviveCommand implements CommandExecutor, TabExecutor {
             if(plugin.getConfig().getBoolean("settings.revive-sound.enabled")) {
                 utils.PlaySoundEveryone(plugin.getConfig().getString("settings.revive-sound.sound"));
             }
-            utils.broadcast(utils.color("Player " + targetPlayerName + " has been revived.", true));
+            utils.broadcast(Messages.text("revive_broadcast", "player", targetPlayerName));
             if(plugin.getConfig().getBoolean("discord-webhook.notify-on.revive.enabled")){
                 DiscordWebhookNotifier.sendWebhookNotification("Player " + targetPlayerName + " has been revived by " + commandSender.getName(), targetPlayerName, plugin.getConfig().getBoolean("discord-webhook.notify-on.revive.ping-role"));
             }
             return true;
         }
         else{
-            commandSender.sendMessage(utils.color("&cUsage: /revive <player>", true));
+            Messages.send(commandSender, "revive_usage");
             return false;
         }
     }
