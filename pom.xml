@@ -6,7 +6,7 @@
 
   <groupId>nl.devistrap</groupId>
   <artifactId>hardcore</artifactId>
-  <version>1.0.17</version>
+  <version>1.0.18</version>
   <packaging>jar</packaging>
 
   <name>hardcore</name>
