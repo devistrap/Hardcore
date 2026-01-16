@@ -4,7 +4,7 @@
   <groupId>nl.devistrap</groupId>
   <artifactId>hardcore</artifactId>
   <name>hardcore</name>
-  <version>1.0.6</version>
+  <version>1.0.9</version>
   <build>
     <defaultGoal>clean package</defaultGoal>
     <resources>
@@ -53,6 +53,12 @@
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
       <version>1.18.30</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.velocitypowered</groupId>
+      <artifactId>velocity-api</artifactId>
+      <version>3.4.0-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>
