@@ -1,26 +1,22 @@
 package nl.devistrap.hardcore;
 
-import com.velocitypowered.api.proxy.ProxyServer;
 import nl.devistrap.hardcore.commands.*;
 import nl.devistrap.hardcore.events.JoinEvent;
 import nl.devistrap.hardcore.events.deathEvent;
+import nl.devistrap.hardcore.service.CommandExecutor;
+import org.bukkit.Bukkit;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import javax.inject.Inject;
-import java.net.Proxy;
 
 public final class Hardcore extends JavaPlugin {
 
 
-    private final ProxyServer proxy;
 
-    @Inject
-    public Hardcore(ProxyServer proxy) {
-        this.proxy = proxy;
-    }
 
     private DatabaseManager databaseManager;
+    private CommandExecutor commandExecutor;
+
 
     @Override
     public void onEnable() {
@@ -30,6 +26,8 @@ public final class Hardcore extends JavaPlugin {
         databaseManager = new DatabaseManager();
         databaseManager.connect();
         new utils(this);
+        Bukkit.getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
+        this.commandExecutor = new CommandExecutor(this);
 
         new HardCoreCommand(this);
         new DeathBanCommand(this);
@@ -54,7 +52,7 @@ public final class Hardcore extends JavaPlugin {
         return databaseManager;
     }
 
-    public ProxyServer getProxy() {
-        return proxy;
+    public CommandExecutor getCommandExecutor() {
+        return commandExecutor;
     }
 }

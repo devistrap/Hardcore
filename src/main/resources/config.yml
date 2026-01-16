@@ -7,8 +7,8 @@ settings:
 
 velocity-module:
     enabled: false
+    server-to-send: "verliezers"
     commands-to-execute:
-      - "send {player} verliezerseiland"
       - "msg {player} You have been deathbanned for {duration} minutes."
 
 discord-webhook:

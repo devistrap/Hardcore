@@ -1,11 +1,12 @@
 package nl.devistrap.hardcore.events;
 
-import com.velocitypowered.api.proxy.ProxyServer;
+
 import nl.devistrap.hardcore.DatabaseManager;
 import nl.devistrap.hardcore.Hardcore;
 import nl.devistrap.hardcore.service.DiscordWebhookNotifier;
-import nl.devistrap.hardcore.service.VelocityCommandExecutor;
+import nl.devistrap.hardcore.service.CommandExecutor;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -15,12 +16,11 @@ import java.sql.Timestamp;
 public class deathEvent implements Listener {
 
     private final Hardcore plugin;
-    private final ProxyServer proxy;
+
     private final DatabaseManager dbManager;
 
     public deathEvent(Hardcore plugin) {
         this.plugin = plugin;
-        this.proxy = plugin.getProxy();
         this.dbManager = plugin.getDatabaseManager();
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
@@ -42,9 +42,23 @@ public class deathEvent implements Listener {
                 DiscordWebhookNotifier.sendWebhookNotification("Player " + event.getEntity().getName() + " has been deathbanned", event.getEntity().getName(), plugin.getConfig().getBoolean("discord-webhook.notify-on.automatic-deathban.ping-role"));
             }
             dbManager.deathBanPlayer(event.getEntity(), new Timestamp(System.currentTimeMillis() + Integer.parseInt(timeBanned) * 60 * 1000));
-            event.getEntity().kickPlayer("You have been deathbanned for " + timeBanned + " minutes.");
-            VelocityCommandExecutor executor = new VelocityCommandExecutor(proxy, plugin);
-            executor.executeCommands(event.getEntity().getName());
+            if(plugin.getConfig().getBoolean("velocity-module.enabled")) {
+                Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                    Player player = Bukkit.getPlayer(event.getEntity().getUniqueId());
+                    if (player != null && player.isOnline()) {
+                        plugin.getLogger().info("Sending deathbanned player " + player.getName() + " to " + plugin.getConfig().getString("velocity-module.server-to-send"));
+                        plugin.getCommandExecutor().executeCommands(player.getName());
+                        if(plugin.getConfig().getString("velocity-module.server-to-send") != null && !plugin.getConfig().getString("velocity-module.server-to-send").isEmpty()) {
+                            plugin.getCommandExecutor().SendCommand(plugin.getConfig().getString("velocity-module.server-to-send"), player);
+                        }
+                    } else {
+                        plugin.getLogger().warning("Player went offline before commands could be executed");
+                    }
+                }, 20L);
+            }
+            else{
+                event.getEntity().getPlayer().kickPlayer("You are deathbanned!");
+            }
         }
         else{
             if (plugin.getConfig().getBoolean("discord-webhook.notify-on.automatic-deathban.enabled")) {
