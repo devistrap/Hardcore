@@ -2,6 +2,7 @@ name: Hardcore
 version: ${project.version}
 main: nl.devistrap.hardcore.Hardcore
 api-version: '1.21'
+softdepend: ["PlaceholderAPI", "LuckPerms"]
 authors:
   - Devistrap
 description: A hardcore game mode plugin for Minecraft servers.

@@ -6,9 +6,8 @@ import nl.devistrap.hardcore.events.JoinEvent;
 import nl.devistrap.hardcore.events.deathEvent;
 import nl.devistrap.hardcore.service.CommandExecutor;
 import nl.devistrap.hardcore.service.Messages;
+import nl.devistrap.hardcore.service.PlaceholderApi;
 import org.bukkit.Bukkit;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 
@@ -26,13 +25,19 @@ public final class Hardcore extends JavaPlugin {
         saveDefaultConfig();
         getLogger().info("Hardcore plugin has been enabled!");
         getConfig().set("version", getDescription().getVersion());
+
+
         Messages.init(this);
+        new utils(this);
         databaseManager = new DatabaseManager(this);
         databaseManager.connect();
-        new utils(this);
-        RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
-        if (provider != null) {
-            utils.lpapi = provider.getProvider();
+
+
+        if (Bukkit.getServicesManager().getRegistration(LuckPerms.class) != null) {
+            utils.lpapi = Bukkit.getServicesManager().getRegistration(LuckPerms.class).getProvider();
+        }
+        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+            new PlaceholderApi(this).register();
         }
         Bukkit.getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
         this.commandExecutor = new CommandExecutor(this);

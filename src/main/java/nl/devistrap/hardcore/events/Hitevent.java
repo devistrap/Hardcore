@@ -57,13 +57,6 @@ public class Hitevent implements Listener {
         if(dbManager.getGracePeriod(damagerPlayer.getName()) * 60000 > damagerPlayer.getStatistic(org.bukkit.Statistic.PLAY_ONE_MINUTE)){
             Messages.send(damagerPlayer, "grace_target_active");
             event.setCancelled(true);
-            return;
         }
-
-
-
-
-
-        return;
     }
 }

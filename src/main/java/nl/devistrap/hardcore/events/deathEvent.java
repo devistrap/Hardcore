@@ -5,7 +5,6 @@ import nl.devistrap.hardcore.DatabaseManager;
 import nl.devistrap.hardcore.Hardcore;
 import nl.devistrap.hardcore.service.DiscordWebhookNotifier;
 import nl.devistrap.hardcore.service.Messages;
-import nl.devistrap.hardcore.service.CommandExecutor;
 import nl.devistrap.hardcore.utils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
