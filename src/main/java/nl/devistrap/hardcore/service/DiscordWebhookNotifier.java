@@ -48,8 +48,6 @@ public class DiscordWebhookNotifier {
                                 + "}",
                         message, serverName, avatarUrl
                 );
-                plugin.getLogger().info("JSON Payload: " + JsonPayload);
-
                 try (OutputStream outputStream = connection.getOutputStream()) {
                     outputStream.write(JsonPayload.getBytes());
                     outputStream.flush();

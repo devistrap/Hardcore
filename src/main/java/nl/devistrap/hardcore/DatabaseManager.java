@@ -68,7 +68,6 @@ public class DatabaseManager {
         try {
             if (connection != null && !connection.isClosed()) {
                 connection.close();
-                System.out.println("Disconnected from SQLite database.");
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -194,8 +193,6 @@ public class DatabaseManager {
             ResultSet rs = pstmt.executeQuery();
 
             if (rs.next()) {
-
-                System.out.println(rs.getLong("grace_time"));
                 return rs.getLong("grace_time");
             }
 

@@ -34,6 +34,7 @@ public class HardCoreCommand implements CommandExecutor, TabExecutor {
         String option = args[0];
         if (option.equalsIgnoreCase("reload")) {
             plugin.reloadConfig();
+            Messages.init(plugin);
             Messages.send(commandSender, "hardcore_reloaded");
             if (plugin.getConfig().getBoolean("discord-webhook.notify-on.config-reload.enabled")) {
                 DiscordWebhookNotifier.sendWebhookNotification("Config has been reloaded by " + commandSender.getName(), command.getName(), plugin.getConfig().getBoolean("discord-webhook.notify-on.config-reload.ping-role"));
