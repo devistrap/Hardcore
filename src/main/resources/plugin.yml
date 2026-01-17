@@ -20,3 +20,5 @@ commands:
         description: Revive a deathbanned player.
     grace:
         description: Check your remaining grace period time.
+    pvp:
+        description: Toggle World pvp.

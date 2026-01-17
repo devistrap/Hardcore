@@ -1,4 +1,4 @@
-name: Auto Version and Release
+name: Auto Version, Build, Obfuscate and Release
 
 on:
   push:
@@ -53,8 +53,18 @@ jobs:
           git commit -m "chore: auto-increment version to ${{ steps.increment-version.outputs.new_version }}"
           git push
 
-      - name: Build with Maven
+      - name: Build with Maven (including obfuscation)
         run: mvn clean package
+
+      - name: Verify Obfuscated JAR
+        run: |
+          OBFUSCATED_JAR="target/hardcore-${{ steps.increment-version.outputs.new_version }}.jar"
+          if [ ! -f "$OBFUSCATED_JAR" ]; then
+            echo "Error: Obfuscated JAR not found at $OBFUSCATED_JAR"
+            ls -la target/
+            exit 1
+          fi
+          echo "Obfuscated JAR created successfully: $OBFUSCATED_JAR"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
@@ -62,6 +72,9 @@ jobs:
           tag_name: v${{ steps.increment-version.outputs.new_version }}
           name: Release v${{ steps.increment-version.outputs.new_version }}
           generate_release_notes: true
-          files: target/*.jar
+          files: |
+            target/hardcore-${{ steps.increment-version.outputs.new_version }}.jar
+            target/hardcore-${{ steps.increment-version.outputs.new_version }}-shaded.jar
+            target/hardcore-${{ steps.increment-version.outputs.new_version }}-obfuscated.jar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
