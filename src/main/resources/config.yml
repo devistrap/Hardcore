@@ -19,6 +19,7 @@ velocity-module:
     server-to-send: ""
     commands-to-execute:
       - "msg {player} You have been deathbanned"
+
 luckperms-module:
   enabled: false
   deathbanned-has-permission: "hardcore.deathbanned"

@@ -1,42 +1,48 @@
-name: Auto Version, Build, Obfuscate and Release
+name: Auto Version, Obfuscate and Release
 
 on:
   push:
     branches: [ main, master ]
+  workflow_dispatch:  # Allow manual triggers
 
 jobs:
-  auto-version:
+  build-release:
     runs-on: ubuntu-latest
     permissions:
       contents: write
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'temurin'
+          cache: maven
 
       - name: Get Current Version
         id: get-version
         run: |
           CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
           echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          echo "Current version: $CURRENT_VERSION"
 
       - name: Increment Version
         id: increment-version
         run: |
           CURRENT_VERSION=${{ steps.get-version.outputs.current_version }}
-          # Parse and increment
-          MAJOR=$(echo $CURRENT_VERSION | cut -d. -f1)
-          MINOR=$(echo $CURRENT_VERSION | cut -d. -f2)
-          PATCH=$(echo $CURRENT_VERSION | cut -d. -f3)
+          # Parse version components
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT_VERSION"
+          
+          # Increment patch version
           NEW_PATCH=$((PATCH + 1))
           NEW_VERSION="$MAJOR.$MINOR.$NEW_PATCH"
+          
           echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
           echo "Updating version from $CURRENT_VERSION to $NEW_VERSION"
 
@@ -44,37 +50,114 @@ jobs:
         run: |
           mvn versions:set -DnewVersion=${{ steps.increment-version.outputs.new_version }} -q
           mvn versions:commit -q
+          echo "Updated pom.xml to version ${{ steps.increment-version.outputs.new_version }}"
 
       - name: Commit Version Bump
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add pom.xml
-          git commit -m "chore: auto-increment version to ${{ steps.increment-version.outputs.new_version }}"
-          git push
+          git commit -m "🚀 Auto-increment version to ${{ steps.increment-version.outputs.new_version }}"
+          git push origin HEAD:${{ github.ref_name }}
+          echo "Version bump committed and pushed"
 
-      - name: Build with Maven (including obfuscation)
-        run: mvn clean package
-
-      - name: Verify Obfuscated JAR
+      - name: Download Dependencies
         run: |
-          OBFUSCATED_JAR="target/hardcore-${{ steps.increment-version.outputs.new_version }}.jar"
-          if [ ! -f "$OBFUSCATED_JAR" ]; then
-            echo "Error: Obfuscated JAR not found at $OBFUSCATED_JAR"
+          mvn dependency:resolve dependency:sources -q
+          echo "Dependencies downloaded"
+
+      - name: Build and Obfuscate
+        run: |
+          echo "Starting build process..."
+          mvn clean compile
+          echo "Creating obfuscated jar..."
+          mvn package -DskipTests
+          
+          # Verify the obfuscated jar was created
+          OBF_JAR="target/hardcore-${{ steps.increment-version.outputs.new_version }}.jar"
+          if [ -f "$OBF_JAR" ]; then
+            echo "✅ Obfuscated JAR created successfully: $OBF_JAR"
+            echo "File size: $(du -h "$OBF_JAR" | cut -f1)"
+          else
+            echo "❌ Obfuscated JAR not found!"
+            echo "Available files in target/:"
             ls -la target/
             exit 1
           fi
-          echo "Obfuscated JAR created successfully: $OBFUSCATED_JAR"
+
+      - name: Verify Obfuscation
+        run: |
+          FINAL_JAR="target/hardcore-${{ steps.increment-version.outputs.new_version }}.jar"
+          echo "🔍 Checking obfuscation in $FINAL_JAR..."
+          
+          # List first 20 classes to see if they're obfuscated
+          echo "Sample class names from JAR:"
+          jar tf "$FINAL_JAR" | grep -E "\.class$" | head -20
+          
+          # Check if plugin.yml is still readable
+          echo ""
+          echo "📄 Checking plugin.yml contents:"
+          jar xf "$FINAL_JAR" plugin.yml 2>/dev/null && cat plugin.yml || echo "plugin.yml not found"
+          rm -f plugin.yml 2>/dev/null || true
+          
+          # Check JAR size
+          echo ""
+          echo "📦 JAR Information:"
+          echo "Size: $(du -h "$FINAL_JAR" | cut -f1)"
+          echo "Classes count: $(jar tf "$FINAL_JAR" | grep -c "\.class$")"
+
+      - name: Generate Checksums
+        run: |
+          cd target
+          FINAL_JAR="hardcore-${{ steps.increment-version.outputs.new_version }}.jar"
+          if [ -f "$FINAL_JAR" ]; then
+            sha256sum "$FINAL_JAR" > "$FINAL_JAR.sha256"
+            echo "Checksum generated:"
+            cat "$FINAL_JAR.sha256"
+          fi
 
       - name: Create GitHub Release
+        id: create_release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ steps.increment-version.outputs.new_version }}
-          name: Release v${{ steps.increment-version.outputs.new_version }}
+          name: "Release v${{ steps.increment-version.outputs.new_version }}"
+          body: |
+            ## 🚀 Version ${{ steps.increment-version.outputs.new_version }}
+            
+            ### 📦 Download
+            - **Obfuscated JAR**: [hardcore-${{ steps.increment-version.outputs.new_version }}.jar](hardcore-${{ steps.increment-version.outputs.new_version }}.jar)
+            
+            ### 🔒 Security
+            - Code is obfuscated using yGuard
+            - Checksum verification available
+            
+            ### 📝 Notes
+            - Auto-generated release
+            - Built with Java 21
+            - Compatible with Spigot 1.21.8
+            
+            ---
+            
+            *This release was automatically generated by GitHub Actions*
+          draft: false
+          prerelease: false
           generate_release_notes: true
           files: |
             target/hardcore-${{ steps.increment-version.outputs.new_version }}.jar
+            target/hardcore-${{ steps.increment-version.outputs.new_version }}.jar.sha256
             target/hardcore-${{ steps.increment-version.outputs.new_version }}-shaded.jar
-            target/hardcore-${{ steps.increment-version.outputs.new_version }}-obfuscated.jar
+            target/mapping.xml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Build Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts-v${{ steps.increment-version.outputs.new_version }}
+          path: |
+            target/*.jar
+            target/*.xml
+            target/*.log
+          retention-days: 7

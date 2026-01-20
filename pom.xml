@@ -14,6 +14,7 @@
   <properties>
     <java.version>21</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <proguard.version>7.4.2</proguard.version>
   </properties>
 
   <build>
@@ -28,18 +29,170 @@
           <target>${java.version}</target>
         </configuration>
       </plugin>
+
+      <!-- Create shaded jar -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
         <version>3.5.3</version>
         <executions>
           <execution>
+            <id>shade-jar</id>
             <phase>package</phase>
             <goals>
               <goal>shade</goal>
             </goals>
+            <configuration>
+              <finalName>${project.artifactId}-${project.version}-shaded</finalName>
+              <createDependencyReducedPom>false</createDependencyReducedPom>
+              <filters>
+                <filter>
+                  <artifact>*:*</artifact>
+                  <excludes>
+                    <exclude>META-INF/*.SF</exclude>
+                    <exclude>META-INF/*.DSA</exclude>
+                    <exclude>META-INF/*.RSA</exclude>
+                  </excludes>
+                </filter>
+              </filters>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <mainClass>nl.devistrap.hardcore.Main</mainClass>
+                </transformer>
+              </transformers>
+            </configuration>
           </execution>
         </executions>
+      </plugin>
+
+      <!-- ProGuard Obfuscation -->
+      <plugin>
+        <groupId>com.github.wvengen</groupId>
+        <artifactId>proguard-maven-plugin</artifactId>
+        <version>${proguard.version}</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>proguard</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <proguardVersion>${proguard.version}</proguardVersion>
+          <injar>${project.artifactId}-${project.version}-shaded.jar</injar>
+          <outjar>${project.artifactId}-${project.version}.jar</outjar>
+          <outputDirectory>${project.build.directory}</outputDirectory>
+          <obfuscate>true</obfuscate>
+          <attach>true</attach>
+          <attachArtifactId>${project.artifactId}</attachArtifactId>
+          <attachType>jar</attachType>
+
+          <libs>
+            <lib>${java.home}/jmods/java.base.jmod</lib>
+          </libs>
+
+          <options>
+            <!-- Basic options -->
+            <option>-dontwarn</option>
+            <option>-dontnote</option>
+            <option>-ignorewarnings</option>
+            <option>-dontoptimize</option>
+
+            <!-- Keep annotations and signatures -->
+            <option>-keepattributes *Annotation*,Signature,InnerClasses,EnclosingMethod</option>
+            <option>-keepattributes Exceptions</option>
+            <option>-keepattributes SourceFile,LineNumberTable</option>
+
+            <!-- Keep the main plugin class -->
+            <option>-keep public class nl.devistrap.hardcore.Main {
+              public &lt;init&gt;(...);
+              public void onEnable();
+              public void onDisable();
+              public static void main(java.lang.String[]);
+              }</option>
+
+            <!-- Keep all classes extending JavaPlugin -->
+            <option>-keep public class * extends org.bukkit.plugin.java.JavaPlugin {
+              public protected *;
+              }</option>
+
+            <!-- Keep all event listeners -->
+            <option>-keep class * implements org.bukkit.event.Listener {
+              public protected *;
+              }</option>
+
+            <!-- Keep all command executors -->
+            <option>-keep class * implements org.bukkit.command.CommandExecutor {
+              public protected *;
+              }</option>
+
+            <!-- Keep all tab completers -->
+            <option>-keep class * implements org.bukkit.command.TabCompleter {
+              public protected *;
+              }</option>
+
+            <!-- Keep PlaceholderAPI expansions -->
+            <option>-keep class * implements me.clip.placeholderapi.expansion.PlaceholderExpansion {
+              public protected *;
+              }</option>
+
+            <!-- Keep configuration files -->
+            <option>-keepclassmembers class * {
+              *** config;
+              *** getConfig();
+              *** saveConfig();
+              *** reloadConfig();
+              }</option>
+
+            <!-- Keep enum values -->
+            <option>-keepclassmembers enum * {
+              public static **[] values();
+              public static ** valueOf(java.lang.String);
+              }</option>
+
+            <!-- Keep resource files -->
+            <option>-keepresources plugin.yml</option>
+            <option>-keepresources config.yml</option>
+            <option>-keepresources *.properties</option>
+            <option>-keepresources META-INF/MANIFEST.MF</option>
+
+            <!-- Don't warn about provided dependencies -->
+            <option>-dontwarn org.spigotmc.**</option>
+            <option>-dontwarn org.bukkit.**</option>
+            <option>-dontwarn net.luckperms.**</option>
+            <option>-dontwarn me.clip.placeholderapi.**</option>
+            <option>-dontwarn org.jetbrains.annotations.**</option>
+            <option>-dontwarn lombok.**</option>
+
+            <!-- Obfuscation options -->
+            <option>-overloadaggressively</option>
+            <option>-useuniqueclassmembernames</option>
+            <option>-allowaccessmodification</option>
+
+            <!-- Keep package structure for your main package -->
+            <option>-keeppackagenames nl.devistrap.hardcore</option>
+
+            <!-- Keep method parameter names for commands (optional) -->
+            <option>-keepparameternames</option>
+          </options>
+
+          <!-- Dependencies to include in obfuscation -->
+          <dependencyArtifacts>
+            <dependencyArtifact>
+              <groupId>com.guardsquare</groupId>
+              <artifactId>proguard-base</artifactId>
+            </dependencyArtifact>
+          </dependencyArtifacts>
+        </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>com.guardsquare</groupId>
+            <artifactId>proguard-base</artifactId>
+            <version>${proguard.version}</version>
+            <scope>runtime</scope>
+          </dependency>
+        </dependencies>
       </plugin>
     </plugins>
     <resources>
@@ -51,18 +204,18 @@
   </build>
 
   <repositories>
-      <repository>
-        <id>spigotmc-repo</id>
-        <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
-      </repository>
-      <repository>
-        <id>papermc</id>
-        <url>https://repo.papermc.io/repository/maven-public/</url>
-      </repository>
-      <repository>
-        <id>placeholderapi</id>
-        <url>https://repo.extendedclip.com/releases/</url>
-      </repository>
+    <repository>
+      <id>spigotmc-repo</id>
+      <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+    </repository>
+    <repository>
+      <id>papermc</id>
+      <url>https://repo.papermc.io/repository/maven-public/</url>
+    </repository>
+    <repository>
+      <id>placeholderapi</id>
+      <url>https://repo.extendedclip.com/releases/</url>
+    </repository>
   </repositories>
 
   <dependencies>
@@ -72,12 +225,12 @@
       <version>1.21.8-R0.1-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
-      <dependency>
-          <groupId>org.jetbrains</groupId>
-          <artifactId>annotations</artifactId>
-          <version>RELEASE</version>
-          <scope>compile</scope>
-      </dependency>
+    <dependency>
+      <groupId>org.jetbrains</groupId>
+      <artifactId>annotations</artifactId>
+      <version>24.1.0</version>
+      <scope>compile</scope>
+    </dependency>
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>

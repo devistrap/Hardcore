@@ -47,6 +47,7 @@ public final class Hardcore extends JavaPlugin {
         new DeathBanListCommand(this);
         new ReviveCommand(this);
         new GraceCommand(this);
+        new PvpCommand(this);
 
         new JoinEvent(this);
         new deathEvent(this);
